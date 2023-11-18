@@ -20,7 +20,7 @@
 
 //프론트에서 백으로 get요청을 보내는 코드
 
-fetch('http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data')
+fetch('http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/meritz')
   .then(response => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -30,6 +30,45 @@ fetch('http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data')
   .then(data => {
     // 받은 데이터를 처리하는 로직을 작성합니다.
     console.log(data);
+    // 데이터 배열로 변환
+
+    priceData = data
+    // 데이터 추출 및 변환
+    const timestamps = Object.keys(priceData['종가']).map(timestamp => {
+      const koreanTime = new Date(parseInt(timestamp)).toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'});
+      console.log(koreanTime);
+      return koreanTime;
+    });
+    const prices = Object.values(priceData['종가']);
+    console.log(prices);
+    // Chart 객체 생성
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    
+    const priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamps,
+            datasets: [{
+                label: '종가',
+                data: prices,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day'
+                    }
+                }
+            }
+        }
+    });
+
   })
   .catch(error => {
     console.error('There has been a problem with your fetch operation:', error);

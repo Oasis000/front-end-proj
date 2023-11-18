@@ -190,41 +190,14 @@
 <script>
   var selected_stock = null;
 
-  // 주식 가격 그래프 표시 함수
-  function showStockGraph(stockData) {
-    selected_stock = stockData;
-
-    const dates = Object.keys(stockData).reverse();
-    const prices = dates.map(date => parseFloat(stockData[date]['4. close']));
-
-    // Chart.js를 사용하여 그래프 그리기
-    const ctx = document.getElementById('stockChart').getContext('2d');
-    const stockChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: dates,
-        datasets: [{
-          label: '주식 가격',
-          data: prices,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: false
-          }
-        }
-      }
-    });
-  }
-
+  var koreanToEnglish = {
+          "신한지주": "shinhan",
+          "메리츠금융지주": "meritz",
+                // 다른 주식 이름들을 추가해줘
+  };
 
   // 선택한 종목을 백엔드로 전송하는 함수
-  function sendStockRequest(stockName) {
-
+  function sendStockRequest1(stockName) {
     // TODO: AJAX 또는 Fetch API를 사용하여 선택한 종목을 백엔드에 전송하는 코드를 작성해야 합니다.
     // 서버에 선택한 종목(stockName)을 보내고, 백엔드에서 주식 가격 정보를 받아와야 합니다.
     console.log(`선택한 종목: ${stockName}`);
@@ -243,6 +216,101 @@
     };
     showStockGraph(mockStockData);
   }
+
+
+
+
+
+  const cors=require("cors");
+const corsOptions ={
+   origin:'*', 
+   credentials:true,            //access-control-allow-credentials:true
+   optionSuccessStatus:200,
+}
+
+app.use(cors(corsOptions)) // Use this after the variable declaration
+
+
+// 선택한 종목을 백엔드로 전송하는 함수
+function sendStockRequest(stockName) {
+  console.log(stockName);
+  fetch(`http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/hana`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // 받은 데이터를 처리하여 showStockGraph 함수 호출
+      console.log(data);
+      // showStockGraph(data);
+
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+    selected_stock = stockName;
+
+  console.log(`선택한 종목: ${stockName}`);
+}
+
+// showStockGraph 함수 (차트 라이브러리를 사용한 데이터 표시)
+function showStockGraph(stockData) {
+  const timestamps = Object.keys(stockData['종가']).map(timestamp => {
+    const koreanTime = new Date(parseInt(timestamp)).toLocaleString('ko-KR', {timeZone: 'Asia/Seoul'});
+    return koreanTime;
+  });
+  const prices = Object.values(stockData['종가']);
+
+  // Chart 객체 생성
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  const priceChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: timestamps,
+          datasets: [{
+              label: '종가',
+              data: prices,
+              borderColor: 'blue',
+              backgroundColor: 'rgba(0, 0, 255, 0.2)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          scales: {
+              x: {
+                  title: {
+                      display: true,
+                      text: '시간'
+                  }
+              },
+              y: {
+                  title: {
+                      display: true,
+                      text: '가격'
+                  }
+              }
+          }
+      }
+  }
+  
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // 예측 결과를 백엔드로 전송하는 함수
   function sendPredictionRequest() {
