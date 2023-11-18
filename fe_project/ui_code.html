@@ -45,7 +45,7 @@
         cursor: pointer;
     }
     #toggleButton {
-      background-color: rgb(40, 40, 135); /* 배경색 */
+      background-color: rgb(69, 69, 135); /* 배경색 */
       color: white; /* 글자색 */
       padding: 9px 15px;
       border: none;
@@ -55,13 +55,13 @@
     }
     /* 눌렀을 때 색*/
     .stock-button:hover {
-      background-color: darkblue;
+      background-color: rgb(42, 42, 42);
     }
     
     .pre-container{
       text-align: center;
     }
-    .prediction-button {
+    #prediction-button {
       justify-content: center;
       padding: 10px 20px;
       background-color: #3498db;
@@ -71,7 +71,7 @@
       cursor: pointer;
     }
     .prediction-button:hover {
-      background-color: #2980b9;
+      background-color: #133a54;
     }
     /*구분선*/
     .divider {
@@ -85,6 +85,13 @@
 
     .info-container{
       text-align: center;
+      justify-content: space-around;
+    }
+    .next-day-container{
+      display: none;
+      text-align: center;
+      justify-content: space-around;
+      color: gray;
     }
 
     /* 팀 정보를 알려주는 세부 정보 버튼 -> 페이지 크기 변화 시 동적으로 변화하도록 설정*/
@@ -101,6 +108,21 @@
       overflow: auto;
       max-height: 500px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .result {
+      display: none;
+      color: black;
+      /* justify-content:space-around ; */
+      border: none;
+      padding: 10% 0;
+      min-width: 18%;
+      /* min-width: 20%;
+      max-width: 20%;
+      min-height: 40%; */
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-top: 10px;
+      border-radius: 20px;
     }
   </style>
 </head>
@@ -153,11 +175,12 @@
 <div class="divider"> </div>
 
 <div class="pre-container"> 
-    <button class="prediction-button" onclick="sendPredictionRequest()">예측 결과 보기</button>
+    <button id="prediction-button" onclick="sendPredictionRequest()">예측 결과 보기</button>
 </div>
 
+<br><br>
 
-
+<!-- <div class="divider"></div> -->
 
 <div class="right-container">
   <div class="info" id="infoBox">
@@ -187,10 +210,33 @@
 </div>
 
 
+  
+
+<div class="next-day-container">
+  <h4>✅<u><span id="nextWeekday"></span></u>의 예측 결과는 아래와 같습니다.</h4>
+</div>
+
+<div class="info-container"> 
+  
+  <!-- LSTM 모델 예측 결과 -->
+  <button id="lstm-prediction" class="result"><h1>LSTM</h1></button>
+
+  <!-- SVM 모델 예측 결과 -->
+  <button id="svm-prediction" class="result"><h1>SVM</h1></button>
+
+  <!-- TF 모델 예측 결과 -->
+  <button id="tf-prediction" class="result"><h1>Transformer</h1></button>
+</div>
+
+
+
+
+
+
 <script src="server.js"></script>
 
 <script>
-  var selected_stock = null;
+  var selected_stock = "신한지주";
 
   var koreanToEnglish = {
           "신한지주": "shinhan",
@@ -316,6 +362,10 @@ function showStockGraph(stockData) {
     console.log('예측 결과 요청');
     // AJAX 또는 Fetch API를 사용하여 예측 결과를 요청하는 코드
     // 받아온 결과를 화면에 표시하는 로직을 작성해야 합니다.
+    svmPrediction=1;
+    lstmPrediction=-1;
+    tfPrediction=1;
+    showResult(svmPrediction, lstmPrediction, tfPrediction);
   }
 
   // JavaScript를 사용하여 현재 날짜를 가져오는 함수.
@@ -325,6 +375,34 @@ function showStockGraph(stockData) {
     const formattedDate = today.toLocaleDateString('ko-KR', options);
     document.getElementById('date').textContent = formattedDate;
   }
+
+  //다음 개장일을 return
+  function display_next_Date() {
+    const today = new Date();
+    // const next_d = new Date(today);
+    // next_d.setDate(today.getDate()+1);
+
+
+    let nextWeekday = new Date(today);
+
+    // 만약 오늘이 토요일(6) 또는 일요일(0)이라면 다음 주 월요일로 설정
+    if (nextWeekday.getDay() === 6) {
+      nextWeekday.setDate(nextWeekday.getDate() + 2);
+    }   // 오늘이 금요일(5)이라면 다음 주 월요일로 설정
+    else if (nextWeekday.getDay() === 5) {
+      nextWeekday.setDate(nextWeekday.getDate() + 3);
+    }
+    else{
+      nextWeekday.setDate(nextWeekday.getDate() + 1);
+    }
+
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const formatted = nextWeekday.toLocaleDateString('ko-KR', options);
+    console.log(nextWeekday);
+    document.getElementById('nextWeekday').textContent = formatted;
+  }
+  display_next_Date();
 
 
   // 버튼 요소와 정보를 표시할 요소를 가져옵니다.
@@ -359,6 +437,40 @@ function showStockGraph(stockData) {
       toggleButton.textContent = '팀 소개 보기';
     }
   });
+
+//예측하기 버튼을 눌렀을 때 나오는 결과 ui
+
+  document.getElementById('prediction-button').addEventListener('click', function() {
+    // 각 모델에 대한 예측값 설
+    const lstmPrediction = Math.random() > 0.5 ? 1 : -1;
+    const svmPrediction = Math.random() > 0.5 ? 1 : -1;
+    const tfPrediction = Math.random() > 0.5 ? 1 : -1;
+    
+    // LSTM 모델 예측 결과 표시
+    // document.getElementById('lstm-prediction').innerText = ` ${lstmPrediction === 1 ? '<h1>LSTM\n상승</h1>' : ':LSTM\n하락'}`;
+
+    document.getElementById('lstm-prediction').style.backgroundColor = lstmPrediction === 1 ?  '#FFC7C2' :'#BDE3FF';
+
+    // SVM 모델 예측 결과 표시
+    
+    document.getElementById('svm-prediction').style.backgroundColor = svmPrediction === 1 ? '#FFC7C2' :'#BDE3FF';
+
+    // TF 모델 예측 결과 표시
+    document.getElementById('tf-prediction').style.backgroundColor = tfPrediction === 1 ? '#FFC7C2' :'#BDE3FF';
+
+    // .next-day-container.style.display='inline-block';
+    const nextContainer = document.querySelectorAll('.next-day-container'); //.result ->디자인
+    nextContainer.forEach(b=> {b.style.display='block';
+    });
+
+    // 각 모델 예측 결과 버튼을 보이도록 설정
+    const predictionButtons = document.querySelectorAll('.result'); //.result ->디자인
+    predictionButtons.forEach(button => {
+      button.style.display = 'inline-block';
+    });
+    
+  });
+
 
 </script>
 

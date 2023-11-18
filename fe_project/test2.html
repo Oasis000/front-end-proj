@@ -1,59 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Info 창 토글</title>
+  <title>주식 가격 예측</title>
   <style>
-    .info {
+    /* 숨김 처리 */
+    .prediction-button {
       display: none;
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #f9f9f9;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      overflow: auto;
-      max-height: 500px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
     }
   </style>
 </head>
 <body>
-  <button id="toggleButton">정보 보기</button>
-  <div class="info" id="infoBox">
-    <div id="info">
-        <h2>팀 소개</h2>
-        우리는 한양대학교 학생이며 졸업프로젝트로 진행한 ~~ 을 웹으로 만들어 보았다. 이 사이트로는 8개의 종목을 svm, TF, lstm 3개의 모델로 분석해 볼 수 있다.<br><br>
-        <img src="./diagram.png">
-        
-        <li>
-            BE : 이수빈
-            <p>백엔드 개발 </p>
-  
-        </li>
-  
-        <li>
-            FE : 김나현
-            <p>html, JavaScript, css를 사용했으며 등</p>
-        </li>
-  
-        <a href="https://github.com/Hanyang-SN/Stock-Price-Prediction">깃허브 주소</a>
-  
-  </div>
 
-  <script>
-    const toggleButton = document.getElementById('toggleButton');
-    const infoBox = document.getElementById('infoBox');
+<!-- 예측하기 버튼 -->
+<button id="predict-button">예측하기</button><br>
 
-    toggleButton.addEventListener('click', function() {
-      if (infoBox.style.display === 'none' || infoBox.style.display === '') {
-        infoBox.style.display = 'block';
-        toggleButton.textContent = '정보 숨기기';
-      } else {
-        infoBox.style.display = 'none';
-        toggleButton.textContent = '정보 보기';
-      }
+<!-- LSTM 모델 예측 결과 -->
+<button id="lstm-prediction" class="prediction-button">LSTM 모델 예측 결과</button>
+
+<!-- SVM 모델 예측 결과 -->
+<button id="svm-prediction" class="prediction-button">SVM 모델 예측 결과</button>
+
+<!-- TF 모델 예측 결과 -->
+<button id="tf-prediction" class="prediction-button">TF 모델 예측 결과</button>
+
+<script>
+  // 예측하기 버튼 클릭 시 처리
+  document.getElementById('predict-button').addEventListener('click', function() {
+    // 각 모델에 대한 예측값 설정 (임의로 설정)
+    const lstmPrediction = Math.random() > 0.5 ? 1 : -1;
+    const svmPrediction = Math.random() > 0.5 ? 1 : -1;
+    const tfPrediction = Math.random() > 0.5 ? 1 : -1;
+
+    // LSTM 모델 예측 결과 표시
+    document.getElementById('lstm-prediction').innerText = `LSTM: ${lstmPrediction === 1 ? 'Red' : 'Blue'}`;
+    document.getElementById('lstm-prediction').style.backgroundColor = lstmPrediction === 1 ? 'red' : 'blue';
+
+    // SVM 모델 예측 결과 표시
+    document.getElementById('svm-prediction').innerText = `SVM: ${svmPrediction === 1 ? 'Red' : 'Blue'}`;
+    document.getElementById('svm-prediction').style.color = svmPrediction === 1 ? 'red' : 'blue';
+
+    // TF 모델 예측 결과 표시
+    document.getElementById('tf-prediction').innerText = `TF: ${tfPrediction === 1 ? 'Red' : 'Blue'}`;
+    document.getElementById('tf-prediction').style.color = tfPrediction === 1 ? 'red' : 'blue';
+
+    // 각 모델 예측 결과 버튼을 보이도록 설정
+    const predictionButtons = document.querySelectorAll('.prediction-button');
+    predictionButtons.forEach(button => {
+      button.style.display = 'inline-block';
     });
-  </script>
+  });
+  
+</script>
+
 </body>
 </html>
