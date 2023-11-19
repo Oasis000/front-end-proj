@@ -230,13 +230,8 @@
 
 
 
-
-
-
-<script src="server.js"></script>
-
 <script>
-  var selected_stock = "신한지주";
+  var selected_stock = null;
 
   var koreanToEnglish = {
           "신한지주": "shinhan",
@@ -245,7 +240,7 @@
   };
 
   // 선택한 종목을 백엔드로 전송하는 함수
-  function sendStockRequest1(stockName) {
+  function sendStockRequest2(stockName) {
     // TODO: AJAX 또는 Fetch API를 사용하여 선택한 종목을 백엔드에 전송하는 코드를 작성해야 합니다.
     // 서버에 선택한 종목(stockName)을 보내고, 백엔드에서 주식 가격 정보를 받아와야 합니다.
     console.log(`선택한 종목: ${stockName}`);
@@ -267,31 +262,65 @@
 
 
 
+  function sendStockRequest1(stockName){
+  const dataToSend = stockName;
+  console.log(dataToSend);
+
+  // fetch API를 사용하여 POST 요청을 보냄
+  fetch('`http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/hana', {
+    method: 'POST',
+    headers: {
+      'string': 'application/json',
+    },
+    body: JSON.stringify({ data: dataToSend }),
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (!data) {
+      throw new Error('Received empty data');
+    }
+    console.log('서버로부터 받은 데이터:', data);
+    // 서버로부터 받은 데이터를 처리
+  })
+  .catch(error => {
+    console.error('오류 발생:', error);
+  });
+}
+
+
+
+
 
 
 // 선택한 종목을 백엔드로 전송하는 함수
 function sendStockRequest(stockName) {
-  fetching('hana');
-  // console.log(stockName);
-  // fetch(`http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/hana`)
-  //   .then(response => {
-  //     if (!response.ok) {
-  //       throw new Error('Network response was not ok');
-  //     }
-  //     return response.json();
-  //   })
-  //   .then(data => {
-  //     // 받은 데이터를 처리하여 showStockGraph 함수 호출
-  //     console.log(data);
-  //     // showStockGraph(data);
 
-  //   })
-  //   .catch(error => {
-  //     console.error('There has been a problem with your fetch operation:', error);
-  //   });
-  //   selected_stock = stockName;
+  console.log(stockName);
 
-  // console.log(`선택한 종목: ${stockName}`);
+  fetch(`http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/hana`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // 받은 데이터를 처리하여 showStockGraph 함수 호출
+      console.log(data);
+      // showStockGraph(data);
+
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+    selected_stock = stockName;
+
+  console.log(`선택한 종목: ${stockName}`);
 }
 
 // showStockGraph 함수 (차트 라이브러리를 사용한 데이터 표시)
@@ -346,12 +375,7 @@ function showStockGraph(stockData) {
 
 
 
-
-
-
-
-
-  // 예측 결과를 백엔드로 전송하는 함수
+  // 백엔드로 예측 결과 요청하는 함수.
   function sendPredictionRequest() {
 
     if(selected_stock == null){
@@ -379,10 +403,6 @@ function showStockGraph(stockData) {
   //다음 개장일을 return
   function display_next_Date() {
     const today = new Date();
-    // const next_d = new Date(today);
-    // next_d.setDate(today.getDate()+1);
-
-
     let nextWeekday = new Date(today);
 
     // 만약 오늘이 토요일(6) 또는 일요일(0)이라면 다음 주 월요일로 설정
@@ -395,8 +415,6 @@ function showStockGraph(stockData) {
     else{
       nextWeekday.setDate(nextWeekday.getDate() + 1);
     }
-
-
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const formatted = nextWeekday.toLocaleDateString('ko-KR', options);
     console.log(nextWeekday);

@@ -1,57 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>주식 가격 예측</title>
   <style>
-    /* 숨김 처리 */
-    .prediction-button {
-      display: none;
-      border-radius: 20px;
+    /* 스타일링 */
+    #scrollButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: none; /* 일단 숨김 상태로 설정 */
     }
   </style>
 </head>
 <body>
 
-<!-- 예측하기 버튼 -->
-<button id="predict-button">예측하기</button><br>
+  <!-- 스크롤 버튼 -->
+  <button id="scrollButton">Top</button>
 
-<!-- LSTM 모델 예측 결과 -->
-<button id="lstm-prediction" class="prediction-button">LSTM 모델 예측 결과</button>
+  <script>
+    // 버튼 요소 가져오기
+    const scrollButton = document.getElementById('scrollButton');
 
-<!-- SVM 모델 예측 결과 -->
-<button id="svm-prediction" class="prediction-button">SVM 모델 예측 결과</button>
+    // 스크롤 이벤트 핸들러
+    function handleScroll() {
+      if (window.scrollY > 200) { // 스크롤 위치가 200 이상인 경우
+        scrollButton.style.display = 'block'; // 버튼 표시
+      } else {
+        scrollButton.style.display = 'none'; // 버튼 숨김
+      }
+    }
 
-<!-- TF 모델 예측 결과 -->
-<button id="tf-prediction" class="prediction-button">TF 모델 예측 결과</button>
-
-<script>
-  // 예측하기 버튼 클릭 시 처리
-  document.getElementById('predict-button').addEventListener('click', function() {
-    // 각 모델에 대한 예측값 설정 (임의로 설정)
-    const lstmPrediction = Math.random() > 0.5 ? 1 : -1;
-    const svmPrediction = Math.random() > 0.5 ? 1 : -1;
-    const tfPrediction = Math.random() > 0.5 ? 1 : -1;
-
-    // LSTM 모델 예측 결과 표시
-    document.getElementById('lstm-prediction').innerText = `LSTM: ${lstmPrediction === 1 ? 'Red' : 'Blue'}`;
-    document.getElementById('lstm-prediction').style.backgroundColor = lstmPrediction === 1 ? 'red' : 'blue';
-
-    // SVM 모델 예측 결과 표시
-    document.getElementById('svm-prediction').innerText = `SVM: ${svmPrediction === 1 ? 'Red' : 'Blue'}`;
-    document.getElementById('svm-prediction').style.color = svmPrediction === 1 ? 'red' : 'blue';
-
-    // TF 모델 예측 결과 표시
-    document.getElementById('tf-prediction').innerText = `TF: ${tfPrediction === 1 ? 'Red' : 'Blue'}`;
-    document.getElementById('tf-prediction').style.color = tfPrediction === 1 ? 'red' : 'blue';
-
-    // 각 모델 예측 결과 버튼을 보이도록 설정
-    const predictionButtons = document.querySelectorAll('.prediction-button');
-    predictionButtons.forEach(button => {
-      button.style.display = 'inline-block';
-    });
-  });
-  
-</script>
+    // 스크롤 이벤트를 감지하여 핸들러 호출
+    window.addEventListener('scroll', handleScroll);
+  </script>
 
 </body>
 </html>
