@@ -20,7 +20,7 @@
 
 //프론트에서 백으로 get요청을 보내는 코드
 //왜 js에서는 fetch가 되는데 html파일로 하면 cors 오류가 나는 것이지?!
-function fetching(stockname){
+// function fetching(stockname){
   fetch('http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/hana')
   .then(response => {
     if (!response.ok) {
@@ -74,9 +74,8 @@ function fetching(stockname){
   .catch(error => {
     console.error('There has been a problem with your fetch operation:', error);
   });
-}
 
-// fetching('hana');
+
 //post요청을 보내는 경우
 
 //   fetch('https://your-backend-url.com/api/save', {
