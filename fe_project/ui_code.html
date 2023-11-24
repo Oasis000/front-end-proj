@@ -461,7 +461,31 @@ function getResult(get_url){
 //예측하기 버튼을 눌렀을 때 나오는 결과 ui
 
   document.getElementById('prediction-button').addEventListener('click', function() {
-    
+    const get_url = `http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/result/${stockName_eng}`;
+
+    fetch(get_url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      //받은 결과를 전역변수에 넣어주기.
+      lstmPrediction = data["lstm"]
+      svmPrediction = data["svm"]
+      tfPrediction = data['tf']
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+
+    console.log("in event listener");
+    console.log(lstmPrediction);
+    console.log(svmPrediction);
+    console.log(tfPrediction);
+
     // LSTM 모델 예측 결과 표시
 
     document.getElementById('lstm-prediction').style.backgroundColor = lstmPrediction === 1 ?  '#FFC7C2' :'#BDE3FF';
