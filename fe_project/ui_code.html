@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
   <meta charset="UTF-8">
   <title>주식 예측 페이지</title>
   <!-- 필요한 CSS 또는 스타일링 코드 -->
@@ -271,7 +273,8 @@ function select_Stock(stockName) {
 
 
   console.log(stockName);
-  const be_url = `http://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/${koreanToEnglish[stockName]}`;
+
+  const be_url = `https://ec2-13-124-132-21.ap-northeast-2.compute.amazonaws.com:1235/data/${koreanToEnglish[stockName]}`;
 
   fetch(be_url)
     .then(response => {
